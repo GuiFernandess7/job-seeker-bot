@@ -4,7 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
-#from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 #from selenium.common.exceptions import NoSuchElementException
 
@@ -63,12 +63,47 @@ class JobScraper:
             self.driver_quit()
 
     def apply_search(self, site: str, position: str, mode: str = "remote"):
+        """Search for job postings and return results."""
         self.__check_driver()
-        search_phrase = f"site:{site} '{position}''{mode}'"
-        search = self.driver.find_element(By.NAME, "q")
-        search.send_keys(search_phrase)
-        search.send_keys(Keys.RETURN)
-        time.sleep(5)
+        search_phrase = f"site:{site} '{position}' '{mode}'"
+
+        wait = WebDriverWait(self.driver, 10)
+        search_box = wait.until(
+            EC.presence_of_element_located((By.NAME, "q"))
+        )
+        search_box.send_keys(search_phrase)
+        search_box.send_keys(Keys.RETURN)
+
+        wait.until(
+            EC.presence_of_element_located((By.ID, "search"))
+        )
+
+    def __find_search_elements(self):
+        try:
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "g"))
+            )
+
+        except Exception as e:
+            print(f"Error waiting for elements: {e}")
+            self.driver_quit()
+
+    def get_results(self):
+        pageInfo = []
+        self.__find_search_elements()
+
+        try:
+            searchResults = self.driver.find_elements(By.CSS_SELECTOR, "h3.LC20lb")
+
+            for result in searchResults:
+                text = result.text
+                pageInfo.append(text)
+
+        except Exception as e:
+            print(f"Error extracting results: {e}")
+            self.driver_quit()
+
+        return pageInfo
 
     def driver_quit(self):
         if self.driver:
@@ -79,7 +114,12 @@ def run_news_task():
     scraper = JobScraper()
     scraper.set_webdriver()
     scraper.open_url("https://www.google.com")
-    scraper.apply_search(site="https://jobs[.]lever[.]co", position="React Developer", mode="remote")
+    scraper.apply_search(site="https://jobs[.]lever[.]co", position="Python Developer", mode="remote")
+    results = scraper.get_results()
+
+    for result in results:
+        print(result)
+
     scraper.driver_quit()
 
 if __name__=="__main__":
