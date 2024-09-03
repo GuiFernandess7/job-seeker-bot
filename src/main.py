@@ -10,7 +10,6 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from webdriver_manager.chrome import ChromeDriverManager
 
-import time
 import logging
 
 class JobScraper:
@@ -23,7 +22,7 @@ class JobScraper:
     def set_chrome_options(self):
         """Chrome configuration settings"""
         options = Options()
-        #options.add_argument("--headless")
+        options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-extensions")
         options.add_argument("--disable-gpu")
@@ -94,9 +93,7 @@ class JobScraper:
         try:
             forms = self.driver.find_elements(By.TAG_NAME, "form")
             if forms:
-                inputs = self.driver.find_elements(By.XPATH, "//input | //select | //textarea | //button")
-                if inputs:
-                    return True
+                return True
 
         except Exception as e:
             print(f"Error verifying form: {url} - {e}")
@@ -128,8 +125,16 @@ class JobScraper:
     def apply(self, pageData):
         for _, url in pageData:
             has_form = self.__has_application_form(url)
+
             if has_form:
-                print(has_form)
+                elements = self.driver.find_elements(By.CLASS_NAME, "field")
+
+                for element in elements:
+                    text = element.text
+                    print(f"Field: {text}")
+                #inputs = self.driver.find_elements(By.XPATH, "//input | //select | //textarea | //button")
+
+                ...
 
         return
 
@@ -143,8 +148,9 @@ def run_news_task():
     scraper.set_webdriver()
     scraper.open_url("https://www.google.com")
     # site:https://jobs[.]lever[.]co "React Developer" "remote" -"remote only in the US"
-    scraper.apply_search(site="boards[.]greenhouse[.]io", position="Python Developer", mode="remote")
+    scraper.apply_search(site="boards[.]greenhouse[.]io", position="Python Developer", mode="remote - remote only in the US")
     results = scraper.pages
+    scraper.apply(results)
 
     for result in results:
         print(result)
