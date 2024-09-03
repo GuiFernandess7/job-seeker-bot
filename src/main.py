@@ -88,8 +88,24 @@ class JobScraper:
             print(f"Error waiting for elements: {e}")
             self.driver_quit()
 
-    def get_results(self):
-        pageInfo = []
+    def __has_application_form(self, url) -> bool:
+        self.driver.get(url)
+
+        try:
+            forms = self.driver.find_elements(By.TAG_NAME, "form")
+            if forms:
+                inputs = self.driver.find_elements(By.XPATH, "//input | //select | //textarea | //button")
+                if inputs:
+                    return True
+
+        except Exception as e:
+            print(f"Error verifying form: {url} - {e}")
+
+        return False
+
+    @property
+    def pages(self):
+        pageData = []
         self.__find_search_elements()
 
         try:
@@ -101,13 +117,21 @@ class JobScraper:
                 url = parent.get_attribute("href")
                 urls.append(url)
                 text = result.text
-                pageInfo.append((text, url))
+                pageData.append((text, url))
 
         except Exception as e:
             print(f"Error extracting results: {e}")
             self.driver_quit()
 
-        return pageInfo
+        return pageData
+
+    def apply(self, pageData):
+        for _, url in pageData:
+            has_form = self.__has_application_form(url)
+            if has_form:
+                print(has_form)
+
+        return
 
     def driver_quit(self):
         if self.driver:
@@ -120,7 +144,7 @@ def run_news_task():
     scraper.open_url("https://www.google.com")
     # site:https://jobs[.]lever[.]co "React Developer" "remote" -"remote only in the US"
     scraper.apply_search(site="boards[.]greenhouse[.]io", position="Python Developer", mode="remote")
-    results = scraper.get_results()
+    results = scraper.pages
 
     for result in results:
         print(result)
