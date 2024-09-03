@@ -94,10 +94,14 @@ class JobScraper:
 
         try:
             searchResults = self.driver.find_elements(By.CSS_SELECTOR, "h3.LC20lb")
+            urls = []
 
             for result in searchResults:
+                parent = result.find_element(By.XPATH, "..")
+                url = parent.get_attribute("href")
+                urls.append(url)
                 text = result.text
-                pageInfo.append(text)
+                pageInfo.append((text, url))
 
         except Exception as e:
             print(f"Error extracting results: {e}")
@@ -114,7 +118,8 @@ def run_news_task():
     scraper = JobScraper()
     scraper.set_webdriver()
     scraper.open_url("https://www.google.com")
-    scraper.apply_search(site="https://jobs[.]lever[.]co", position="Python Developer", mode="remote")
+    # site:https://jobs[.]lever[.]co "React Developer" "remote" -"remote only in the US"
+    scraper.apply_search(site="boards[.]greenhouse[.]io", position="Python Developer", mode="remote")
     results = scraper.get_results()
 
     for result in results:
