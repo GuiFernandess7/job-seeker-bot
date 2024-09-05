@@ -6,7 +6,7 @@ from selenium.webdriver.common.keys import Keys
 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-#from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException
 
 from webdriver_manager.chrome import ChromeDriverManager
 
@@ -130,11 +130,20 @@ class JobScraper:
                 elements = self.driver.find_elements(By.CLASS_NAME, "field")
 
                 for element in elements:
-                    text = element.text
-                    print(f"Field: {text}")
-                #inputs = self.driver.find_elements(By.XPATH, "//input | //select | //textarea | //button")
+                    try:
+                        input_element = element.find_element(By.XPATH, ".//input")
+                        print("Input found:", input_element.get_attribute('id'))
+                    except NoSuchElementException:
+                        logging.info(f"Input not found")
+                    else:
+                        input_element = element.find_element(By.TAG_NAME, "input")
+                        text = element.text
+                        if "*" in text:
+                            print(f"Field: {text}")
+                            print(f"input Name: {input_element.get_attribute('id')}")
+                            print('----------')
 
-                ...
+            break
 
         return
 
