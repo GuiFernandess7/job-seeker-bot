@@ -165,7 +165,7 @@ if __name__=="__main__":
     builder = RPAConcreteBuilder()
     bot = JobSeekerBot(builder)
 
-    search_phrase = "React Developer" "remote" " - remote only in the US"
+    search_phrase = "Python Developer Jr"
     bot.build_full_featured_product('http://www.google.com', search_phrase)
     search_results = builder.product.get_search_results()
 
