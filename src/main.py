@@ -51,5 +51,3 @@ if __name__ == "__main__":
     finally:
         builder.driver_quit()
         logging.info("Drive closed.")
-
-# https://www.youtube.com/watch?v=ECMbSLxLRbc

@@ -15,7 +15,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 import logging
 import time
 import random
-import pickle
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -84,7 +83,6 @@ class RPAConcreteBuilder(RPABuilder):
         else:
             raise ValueError("Unsupported browser")
 
-        #self.load_cookies()
         return self
 
     def set_chrome_options(self, headless: bool = False) -> None:
@@ -92,7 +90,6 @@ class RPAConcreteBuilder(RPABuilder):
         if headless:
             options.add_argument("--headless")
 
-        #options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-extensions")
         options.add_argument("--disable-gpu")
@@ -152,31 +149,6 @@ class RPAConcreteBuilder(RPABuilder):
             self._driver.driver.quit()
             logging.info("Driver quit successfully.")
 
-    def is_captcha_present(self) -> bool:
-        """NOT IMPLEMENTED"""
-        try:
-            iframe = self._driver.driver.find_element(By.XPATH, "//iframe[contains(@src, 'recaptcha')]")
-            return True
-        except:
-            return False
-
-    def save_cookies(self, filename="cookies.pkl"):
-        """NOT IMPLEMENTED"""
-        cookies = self._driver.driver.get_cookies()
-        pickle.dump(cookies, open(filename, "wb"))
-        logging.info(f"Cookies saved successfully to {filename}.")
-
-    def load_cookies(self, filename="cookies.pkl"):
-        """NOT IMPLEMENTED"""
-        try:
-            self._driver.driver.get("https://www.google.com")
-            cookies = pickle.load(open(filename, "rb"))
-            for cookie in cookies:
-                self._driver.driver.add_cookie(cookie)
-            logging.info("Cookies loaded successfully.")
-        except FileNotFoundError:
-            logging.warning(f"Cookie file {filename} not found. Continuing without cookies.")
-
 class JobSeekerBot:
 
     def __init__(self, builder: RPABuilder) -> None:
@@ -192,5 +164,5 @@ class JobSeekerBot:
     def build_full_featured_product(self, url: str, search_query: str) -> None:
         self.builder.set_driver().open_url(url)
         self.builder.apply_search(search_query)\
-            .extract_websites()
+                    .extract_websites()
 
