@@ -9,6 +9,7 @@ from selenium.webdriver.common.keys import Keys
 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from webdriver_manager.chrome import ChromeDriverManager
 
@@ -77,15 +78,21 @@ class RPAConcreteBuilder(RPABuilder):
         self._driver = RPAProduct()
 
     def set_driver(self, browser: str = "Chrome") -> RPABuilder:
-        options = self.set_chrome_options(headless=False)
         if browser.lower() == "chrome":
-            self._driver.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+            selenium_url = "http://selenium:4444/wd/hub"
+
+            options = self.set_chrome_options(headless=True)
+
+            self._driver.driver = webdriver.Remote(
+                command_executor=selenium_url,
+                options=options
+            )
         else:
             raise ValueError("Unsupported browser")
 
         return self
 
-    def set_chrome_options(self, headless: bool = False) -> None:
+    def set_chrome_options(self, headless: bool = True) -> None:
         options = Options()
         if headless:
             options.add_argument("--headless")

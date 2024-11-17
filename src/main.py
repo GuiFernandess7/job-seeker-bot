@@ -3,7 +3,7 @@ import os
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-from src.services.bot import RPAConcreteBuilder, JobSeekerBot
+from src.services.rpa.bot import RPAConcreteBuilder, JobSeekerBot
 
 def write_results(path: str, mode: str = "w", result=None):
     with open(path, mode) as f:
