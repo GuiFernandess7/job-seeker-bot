@@ -9,6 +9,7 @@ class JobPostModel(Base):
 
     title = Column(String, nullable=False)
     url = Column(String, nullable=False)
+    searched_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     def __repr__(self):
         return f"<Job(title={self.title}, url={self.url})>"

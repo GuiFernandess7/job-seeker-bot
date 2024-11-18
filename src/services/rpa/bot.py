@@ -2,20 +2,14 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
-from webdriver_manager.chrome import ChromeDriverManager
 
 import logging
-import time
-import random
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -49,10 +43,6 @@ class RPABuilder(ABC):
         pass
 
     @abstractmethod
-    def find_search_elements(self) -> RPABuilder:
-        pass
-
-    @abstractmethod
     def apply_search(self, query: str) -> RPABuilder:
         pass
 
@@ -60,9 +50,15 @@ class RPABuilder(ABC):
     def extract_websites(self) -> RPABuilder:
         pass
 
-    @abstractmethod
-    def driver_quit(self) -> None:
-        pass
+def is_captcha_present(driver):
+    try:
+        captcha_frame = driver.find_element(By.CSS_SELECTOR, "iframe[src*='recaptcha']")
+        if captcha_frame:
+            logging.warning("Captcha detected on the page.")
+            return True
+    except Exception:
+        return False
+    return False
 
 class RPAConcreteBuilder(RPABuilder):
     def __init__(self):
@@ -114,30 +110,29 @@ class RPAConcreteBuilder(RPABuilder):
         logging.info(f"Opened URL: {url}")
         return self
 
-    def find_search_elements(self) -> RPABuilder:
-        self._driver.driver.find_element(By.NAME, "q")
-        return self
-
     def apply_search(self, query: str) -> RPABuilder:
         search_box = self._driver.driver.find_element(By.NAME, "q")
-        wait = WebDriverWait(self._driver.driver, 10)
+        wait = WebDriverWait(self._driver.driver, 20)
         search_box = wait.until(
             EC.presence_of_element_located((By.NAME, "q"))
         )
         search_box.send_keys(query)
         search_box.send_keys(Keys.RETURN)
 
-        time.sleep(random.uniform(2, 5))
-
         wait.until(
             EC.presence_of_element_located((By.ID, "search"))
         )
+
         logging.info(f"Search applied with query: {query}")
         return self
 
     def extract_websites(self) -> RPABuilder:
-        searchResults = self._driver.driver.find_elements(By.CSS_SELECTOR, "h3.LC20lb")
+        if is_captcha_present(self._driver.driver):
+            logging.warning("Skipping extraction due to CAPTCHA.")
+            #self.driver_quit()
+            return self
 
+        searchResults = self._driver.driver.find_elements(By.CSS_SELECTOR, "h3.LC20lb")
         try:
             for result in searchResults:
                 parent = result.find_element(By.XPATH, "..")
@@ -148,7 +143,6 @@ class RPAConcreteBuilder(RPABuilder):
             logging.info(f"Extracted {len(searchResults)} results.")
         except Exception as e:
             logging.error(f"Error extracting results: {e}")
-            self.driver_quit()
         return self
 
     def driver_quit(self) -> None:
@@ -170,6 +164,4 @@ class JobSeekerBot:
 
     def build_full_featured_product(self, url: str, search_query: str) -> None:
         self.builder.set_driver().open_url(url)
-        self.builder.apply_search(search_query)\
-                    .extract_websites()
-
+        self.builder.apply_search(search_query).extract_websites()

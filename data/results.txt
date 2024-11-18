@@ -1,4 +1,0 @@
-('Anúncio: Fullstack react/python júnior #1223022', 'https://www.netvagas.com.br/empresa/anuncios/a1223022/fullstack-react-python-junior/')
-('Anúncio: Júnior backend developer #853771', 'https://www.netvagas.com.br/empresa/anuncios/a853771/junior-backend-developer/')
-('Anúncio: Fullstack developer senior #1223021', 'https://www.netvagas.com.br/empresa/anuncios/a1223021/fullstack-developer-senior/')
-('Anúncio: Desenvolvedor Android #1109395', 'https://www.netvagas.com.br/empresa/anuncios/a1109395/desenvolvedor-android/')
