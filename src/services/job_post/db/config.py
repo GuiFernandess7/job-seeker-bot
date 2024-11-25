@@ -1,3 +1,4 @@
+"""Not implemented"""
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import psycopg2

@@ -1,98 +1,45 @@
 from __future__ import annotations
-from abc import ABC, abstractmethod
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+
+from abc import ABC, abstractmethod
+from typing import List, Tuple
 
 import logging
+import os
+
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-class RPAProduct:
-    def __init__(self):
-        self.driver = None
-        self.search_results = []
-
-    def set_search_results(self, results):
-        self.search_results = results
-
-    def get_search_results(self):
-        return self.search_results
-
 class RPABuilder(ABC):
-    @property
-    @abstractmethod
-    def product(self) -> RPAProduct:
-        pass
 
     @abstractmethod
-    def set_driver(self, browser: str) -> RPABuilder:
+    def get_driver(self) -> webdriver.Chrome:
         pass
-
-    @abstractmethod
-    def set_chrome_options(self) -> None:
-        pass
-
-    @abstractmethod
-    def open_url(self, url: str) -> RPABuilder:
-        pass
-
-    @abstractmethod
-    def apply_search(self, query: str) -> RPABuilder:
-        pass
-
-    @abstractmethod
-    def extract_websites(self) -> RPABuilder:
-        pass
-
-def is_captcha_present(driver):
-    try:
-        captcha_frame = driver.find_element(By.CSS_SELECTOR, "iframe[src*='recaptcha']")
-        if captcha_frame:
-            logging.warning("Captcha detected on the page.")
-            return True
-    except Exception:
-        return False
-    return False
 
 class RPAConcreteBuilder(RPABuilder):
-    def __init__(self):
-        self._driver = RPAProduct()
+    def __init__(self, headless: bool = True, selenium_url: str = None):
+        self.headless = headless
+        self.selenium_url = selenium_url or os.getenv("SELENIUM_URL", "http://localhost:4444/wd/hub")
 
-    @property
-    def product(self) -> RPAProduct:
-        product = self._driver
-        self.reset()
-        return product
+    def get_driver(self) -> webdriver.Chrome:
+        options = self.__set_chrome_options(headless=self.headless)
+        driver = webdriver.Remote(
+            command_executor=self.selenium_url,
+            options=options
+        )
+        return driver
 
-    def reset(self) -> None:
-        self._driver = RPAProduct()
-
-    def set_driver(self, browser: str = "Chrome") -> RPABuilder:
-        if browser.lower() == "chrome":
-            selenium_url = "http://selenium:4444/wd/hub"
-
-            options = self.set_chrome_options(headless=True)
-
-            self._driver.driver = webdriver.Remote(
-                command_executor=selenium_url,
-                options=options
-            )
-        else:
-            raise ValueError("Unsupported browser")
-
-        return self
-
-    def set_chrome_options(self, headless: bool = True) -> None:
+    def __set_chrome_options(self, headless: bool = True) -> Options:
         options = Options()
         if headless:
             options.add_argument("--headless")
-
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-extensions")
         options.add_argument("--disable-gpu")
@@ -105,63 +52,92 @@ class RPAConcreteBuilder(RPABuilder):
         options.binary_location = "/usr/bin/google-chrome"
         return options
 
-    def open_url(self, url: str) -> RPABuilder:
-        self._driver.driver.get(url)
-        logging.info(f"Opened URL: {url}")
-        return self
 
-    def apply_search(self, query: str) -> RPABuilder:
-        search_box = self._driver.driver.find_element(By.NAME, "q")
-        wait = WebDriverWait(self._driver.driver, 20)
-        search_box = wait.until(
-            EC.presence_of_element_located((By.NAME, "q"))
-        )
+def is_captcha_present(driver) -> bool:
+    try:
+        captcha_frame = driver.find_element(By.XPATH, "//iframe[contains(@src, 'recaptcha')]")
+        return captcha_frame.is_displayed()
+    except Exception:
+        return False
+
+class RPABot:
+    def __init__(self, driver, initial_url: str = "https://www.google.com") -> None:
+        self.driver = driver
+        self.initial_url = initial_url
+
+    def get_search_box(self, element_name: str = "q", time_to_wait: int = 20):
+        self.driver.get(self.initial_url)
+        logging.info(f"Opened URL: {self.initial_url}")
+
+        try:
+            search_box = WebDriverWait(self.driver, time_to_wait).until(
+                EC.presence_of_element_located((By.NAME, element_name))
+            )
+        except TimeoutException:
+            logging.error("Timeout: Não foi possível localizar a caixa de pesquisa.")
+            return None
+
+        return search_box
+
+    def apply_search(self, query: str) -> None:
+        search_box = self.get_search_box()
+        if search_box is None:
+            return
+
         search_box.send_keys(query)
         search_box.send_keys(Keys.RETURN)
 
-        wait.until(
-            EC.presence_of_element_located((By.ID, "search"))
-        )
+        try:
+            WebDriverWait(self.driver, 20).until(
+                EC.presence_of_element_located((By.ID, "search"))
+            )
+        except TimeoutException:
+            logging.error("Timeout: Não foi possível localizar os resultados da pesquisa.")
+            return
 
         logging.info(f"Search applied with query: {query}")
-        return self
 
-    def extract_websites(self) -> RPABuilder:
-        if is_captcha_present(self._driver.driver):
-            logging.warning("Skipping extraction due to CAPTCHA.")
-            #self.driver_quit()
-            return self
+    def check_for_captcha(self, query: str) -> bool:
+        if is_captcha_present(self.driver):
+            logging.warning(f"Skipping extraction for query '{query}' due to CAPTCHA.")
+            return True
+        return False
 
-        searchResults = self._driver.driver.find_elements(By.CSS_SELECTOR, "h3.LC20lb")
+    def get_results(self, query: str, link_element: str = "h3.LC20lb") -> List[Tuple[str, str]]:
+        search_results = []
         try:
-            for result in searchResults:
-                parent = result.find_element(By.XPATH, "..")
-                url = parent.get_attribute("href")
-                text = result.text
-                self._driver.search_results.append((text, url))
-
-            logging.info(f"Extracted {len(searchResults)} results.")
+            results = self.driver.find_elements(By.CSS_SELECTOR, link_element)
+            for result in results:
+                url = result.find_element(By.XPATH, "..").get_attribute("href")
+                search_results.append((result.text, url))
+            logging.info(f"Extracted {len(results)} results for query '{query}'.")
         except Exception as e:
-            logging.error(f"Error extracting results: {e}")
-        return self
+            logging.error(f"Error extracting results for query '{query}': {e}")
 
-    def driver_quit(self) -> None:
-        if self._driver.driver:
-            self._driver.driver.quit()
-            logging.info("Driver quit successfully.")
+        return search_results
+
+    def close_driver(self):
+        if self.driver:
+            self.driver.quit()
+            logging.info("Driver closed.")
 
 class JobSeekerBot:
+    def __init__(self, driver: webdriver.Chrome):
+        self.bot = RPABot(driver)
 
-    def __init__(self, builder: RPABuilder) -> None:
-        self._builder = builder
+    def search_and_extract(self, queries: List[str]) -> List[Tuple[str, str]]:
+        all_results = []
+        for query in queries:
+            self.bot.apply_search(query)
 
-    @property
-    def builder(self) -> RPABuilder:
-        return self._builder
+            if self.bot.check_for_captcha(query):
+                continue
 
-    def build_minimal_viable_product(self, url: str) -> None:
-        self.builder.set_driver().open_url(url)
-
-    def build_full_featured_product(self, url: str, search_query: str) -> None:
-        self.builder.set_driver().open_url(url)
-        self.builder.apply_search(search_query).extract_websites()
+            results = self.bot.get_results(query)
+            if results:
+                for result in results:
+                    logging.info(f"Title: {result[0]}, URL: {result[1]}")
+                all_results.extend(results)
+            else:
+                logging.warning(f"No results found for query '{query}'")
+        return all_results

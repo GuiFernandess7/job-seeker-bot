@@ -1,5 +1,6 @@
 .venv
 Pipfile.lock
 deprecated.py
+deprecated01.py
 queries.md
 .env
