@@ -1,4 +1,4 @@
-# Scraper/RPA Application for Developer Jr Job Openings
+# RPA Scraper for Junior Developer Job Vacancies
 
 ## Introduction
 
