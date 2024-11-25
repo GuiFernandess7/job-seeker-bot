@@ -23,20 +23,32 @@ def write_results(path: str, mode: str = "w", result=None):
 
 if __name__ == "__main__":
     job_queries = [
-        "site:netvagas.com.br python junior developer",
-        "site:boards.greenhouse.io python junior developer"
-        "site:infojobs.com.br python junior",
-        "site:catho.com.br python junior",
-        "site:linkedin.com/jobs python junior",
-        "site:glassdoor.com.br python junior",
-        "site:indeed.com.br python junior",
-        "site:netvagas.com.br junior developer",
-        "site:boards.greenhouse.io junior developer",
-        "site:infojobs.com.br junior developer",
-        "site:catho.com.br junior developer remoto",
-        "site:linkedin.com/jobs junior developer",
-        "site:glassdoor.com.br junior developer",
-        "site:indeed.com.br junior developer remoto",
+        """ site:netvagas.com.br "Desenvolvedor Jr" "remoto" """,
+        """ site:netvagas.com.br "Desenvolvedor Junior" "remoto" """,
+        """ site:netvagas.com.br "Desenvolvedor Python Jr" "remoto" """,
+        """ site:netvagas.com.br "Junior Python Developer" """,
+
+        """site:https://jobs[.]lever[.]co "Junior Developer" "remote" -"remote only in the US""",
+        """site:https://jobs[.]lever[.]co "Junior Developer" "remote" """,
+        """site:https://jobs[.]lever[.]co "Junior Python Developer" "remote" """,
+
+        """ site:boards[.]greenhouse[.]io "Junior Developer" "remote" -"remote only in the US" """,
+        """ site:boards[.]greenhouse[.]io "Junior Developer" "remote" """,
+        """ site:boards[.]greenhouse[.]io "Junior Python Developer" "remote" """,
+        """ site:boards[.]greenhouse[.]io "Python Developer" "remote" """,
+
+        """ site:jobs[.]ashbyhq[.]com "Junior Developer" "remote" -"remote only in the US" """,
+        """ site:jobs[.]ashbyhq[.]com "Junior Developer" "remote" """,
+        """ site:jobs[.]ashbyhq[.]com "Junior Python Developer" "remote" """,
+        """ site:jobs[.]ashbyhq[.]com "Junior Developer" "remote" """,
+
+        """ site:jobs[.]jobvite[.]com "Junior Developer" "remote" -"remote only in the US" """,
+        """ site:jobs[.]jobvite[.]com "Junior Developer" "remote" """,
+        """ site:jobs[.]jobvite[.]com "Junior Python Developer" "remote" """,
+
+        """ site:myworkdayjobs[.]com "Junior Developer" "remote" -"remote only in the US" """
+        """ site:myworkdayjobs[.]com "Junior Developer" "remote" """
+        """ site:myworkdayjobs[.]com "Junior Python Developer" "remote" """
     ]
 
     all_results = []
@@ -61,3 +73,18 @@ if __name__ == "__main__":
 
     for result in search_results:
         write_results(path=full_path, mode='a', result=result)
+
+#"site:netvagas.com.br python junior developer",
+#"site:boards.greenhouse.io python junior developer"
+#"site:infojobs.com.br python junior",
+#"site:catho.com.br python junior",
+#"site:linkedin.com/jobs python junior",
+#"site:glassdoor.com.br python junior",
+#"site:indeed.com.br python junior",
+#"site:netvagas.com.br junior developer",
+#"site:boards.greenhouse.io junior developer",
+#"site:infojobs.com.br junior developer",
+#"site:catho.com.br junior developer remoto",
+#"site:linkedin.com/jobs junior developer",
+#"site:glassdoor.com.br junior developer",
+#"site:indeed.com.br junior developer remoto"
