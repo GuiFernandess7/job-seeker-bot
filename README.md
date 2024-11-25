@@ -112,8 +112,8 @@ You can configure various parameters in the `.env` file. Ensure that any necessa
 
 ## Demo
 
+https://github.com/user-attachments/assets/2cb8a1ed-e7b7-482d-83c4-1105f25f546d
+
 ## Conclusion
 
 This setup provides a fully containerized solution for scraping job listings from multiple websites. It simplifies running the application in a consistent environment using Docker, and all the job data will be saved in a CSV file for easy access.
-
-Enjoy scraping job listings and automating your job search!
