@@ -21,34 +21,57 @@ def write_results(path: str, mode: str = "w", result=None):
         writer.writerow(result)
         logging.info(f'[DATA] - {result} written to CSV')
 
+"""Change above"""
+
 if __name__ == "__main__":
     job_queries = [
-        """ site:netvagas.com.br "Desenvolvedor Jr" "remoto" """,
-        """ site:netvagas.com.br "Desenvolvedor Junior" "remoto" """,
-        """ site:netvagas.com.br "Desenvolvedor Python Jr" "remoto" """,
-        """ site:netvagas.com.br "Junior Python Developer" """,
+        """ site:https://gupy[.]io "Python Developer" "remote" "remote only in the USA" """,
+        """ site:https://gupy[.]io "Desenvolvedor Python" "remoto" """,
+        """ site:https://gupy[.]io "Python Developer" "remote" """,
+        """ site:https://gupy[.]io "Junior Developer" """,
+        """ site:https://gupy[.]io "Junior Developer" "remote" """,
 
-        """site:https://jobs[.]lever[.]co "Junior Developer" "remote" -"remote only in the US""",
-        """site:https://jobs[.]lever[.]co "Junior Developer" "remote" """,
-        """site:https://jobs[.]lever[.]co "Junior Python Developer" "remote" """,
+        """ site:https://jobs[.]lever[.]co "Python Developer" "remote" "remote only in the USA" """,
+        """ site:https://jobs[.]lever[.]co "Desenvolvedor Python" "remoto" """,
+        """ site:https://jobs[.]lever[.]co "Python Developer" "remote" """,
+        """ site:https://jobs[.]lever[.]co "Junior Developer" """,
+        """ site:https://jobs[.]lever[.]co "Junior Developer" "remote" "Brazil" """,
 
-        """ site:boards[.]greenhouse[.]io "Junior Developer" "remote" -"remote only in the US" """,
-        """ site:boards[.]greenhouse[.]io "Junior Developer" "remote" """,
-        """ site:boards[.]greenhouse[.]io "Junior Python Developer" "remote" """,
-        """ site:boards[.]greenhouse[.]io "Python Developer" "remote" """,
+        """ site:https://boards[.]greenhouse[.]io "Python Developer" "remote" "remote only in the USA" """,
+        """ site:https://boards[.]greenhouse[.]io "Desenvolvedor Python" "remoto" """,
+        """ site:https://boards[.]greenhouse[.]io "Python Developer" "remote" """,
+        """ site:https://boards[.]greenhouse[.]io "Junior Developer" "remote" """,
 
-        """ site:jobs[.]ashbyhq[.]com "Junior Developer" "remote" -"remote only in the US" """,
-        """ site:jobs[.]ashbyhq[.]com "Junior Developer" "remote" """,
-        """ site:jobs[.]ashbyhq[.]com "Junior Python Developer" "remote" """,
-        """ site:jobs[.]ashbyhq[.]com "Junior Developer" "remote" """,
+        """ site:https://jobs[.]ashbyhq[.]com "Python Developer" "remote" "remote only in the USA" """,
+        """ site:https://jobs[.]ashbyhq[.]com "Desenvolvedor Python" "remoto" """,
+        """ site:https://jobs[.]ashbyhq[.]com "Python Developer" "remote" """,
+        """ site:https://jobs[.]ashbyhq[.]com "Junior Developer" "remote" """,
 
-        """ site:jobs[.]jobvite[.]com "Junior Developer" "remote" -"remote only in the US" """,
-        """ site:jobs[.]jobvite[.]com "Junior Developer" "remote" """,
-        """ site:jobs[.]jobvite[.]com "Junior Python Developer" "remote" """,
+        """ site:https://jobs[.]jobvite[.]com "Python Developer" "remote" "remote only in the USA" """,
+        """ site:https://jobs[.]jobvite[.]com "Desenvolvedor Backend" """,
+        """ site:https://jobs[.]jobvite[.]com "Python" "remote" """,
+        """ site:https://jobs[.]jobvite[.]com "Junior Developer" "remote" """,
 
-        """ site:myworkdayjobs[.]com "Junior Developer" "remote" -"remote only in the US" """
-        """ site:myworkdayjobs[.]com "Junior Developer" "remote" """
-        """ site:myworkdayjobs[.]com "Junior Python Developer" "remote" """
+        """ site:https://myworkdayjobs[.]com "Python Developer" "remote" "remote only in the USA" """,
+        """ site:https://myworkdayjobs[.]com "Desenvolvedor Python" "remoto" """,
+        """ site:https://myworkdayjobs[.]com "Python Developer" "remote" """,
+        """ site:https://myworkdayjobs[.]com "Junior Developer" "remote" """,
+
+        """ site:https://jobs[.]workable[.]com "Python Developer" "remote" "remote only in the USA" """,
+        """ site:https://jobs[.]workable[.]com "Desenvolvedor Python" "remoto" """,
+        """ site:https://jobs[.]workable[.]com "Python Developer" "remote" """,
+        """ site:https://jobs[.]workable[.]com "Junior Developer" "remote" """,
+
+        """ site:https://jobs[.]smartrecruiters[.]com "Python Developer" "remote" "remote only in the USA" """,
+        """ site:https://jobs[.]smartrecruiters[.]com "Desenvolvedor Python" "remoto" """,
+        """ site:https://jobs[.]smartrecruiters[.]com "Python Developer" "remote" """,
+        """ site:https://jobs[.]smartrecruiters[.]com "Junior Developer" "remote" """,
+
+        """ site:https://angel[.]co "Python Developer" "remote" "remote only in the USA" """,
+        """ site:https://angel[.]co "Desenvolvedor Python" "remoto" """,
+        """ site:https://angel[.]co "Python Developer" "remote" """,
+        """ site:https://angel[.]co "Junior Developer" """,
+        """ site:https://angel[.]co "Junior Developer" "remote" """
     ]
 
     all_results = []
